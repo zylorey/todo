@@ -180,7 +180,7 @@ int main(int, char**) {
         ImGui::SameLine(ImGui::GetWindowWidth() - 115);
         ImGui::Checkbox("Show Done", &showCompleted);
 
-        ImGui::BeginChild("TaskList", ImVec2(0, -40), true);
+        ImGui::BeginChild("TaskList", ImVec2(0, -32.5), true);
         for (size_t i = 0; i < todos.size(); i++) {
             if (!showCompleted && todos[i].completed) continue;
 
@@ -206,6 +206,7 @@ int main(int, char**) {
             ImGui::PopID();
         }
         ImGui::EndChild();
+        ImGui::Spacing();
 
         if (ImGui::Button("Clear Completed")) {
             todos.erase(std::remove_if(todos.begin(), todos.end(),

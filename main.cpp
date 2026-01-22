@@ -53,7 +53,7 @@ struct TodoItem {
 
 // Auto-save functions
 void saveTodos(const std::vector<TodoItem>& todos) {
-    std::ofstream file("todo.dat");
+    std::ofstream file("save.dat");
     if (file.is_open()) {
         for (const auto& todo : todos) {
             file << todo.completed << "|" << todo.createdAt << "|" << todo.text << "\n";
@@ -63,7 +63,7 @@ void saveTodos(const std::vector<TodoItem>& todos) {
 }
 
 void loadTodos(std::vector<TodoItem>& todos) {
-    std::ifstream file("todos.dat");
+    std::ifstream file("save.dat");
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {

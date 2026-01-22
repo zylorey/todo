@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 
+#define IDI_ICON1 101
+
 #if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
@@ -104,6 +106,16 @@ int main(int, char**) {
 
 #if defined(_WIN32)
     HWND hwnd = glfwGetWin32Window(window);
+
+    HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL),
+                                    MAKEINTRESOURCE(IDI_ICON1),
+                                    IMAGE_ICON,
+                                    0, 0,
+                                    LR_DEFAULTSIZE | LR_SHARED);
+    if (hIcon) {
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    }
 
     // Subclass the window for smooth dragging
     g_OriginalWndProc = (WNDPROC)SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)CustomWndProc);

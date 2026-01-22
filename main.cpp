@@ -1,3 +1,17 @@
+
+
+
+// ███████████    ███████    ██████████      ███████   
+//░█░░░███░░░█  ███░░░░░███ ░░███░░░░███   ███░░░░░███ 
+//░   ░███  ░  ███     ░░███ ░███   ░░███ ███     ░░███
+//    ░███    ░███      ░███ ░███    ░███░███      ░███
+//    ░███    ░███      ░███ ░███    ░███░███      ░███
+//    ░███    ░░███     ███  ░███    ███ ░░███     ███ 
+//    █████    ░░░███████░   ██████████   ░░░███████░  
+//   ░░░░░       ░░░░░░░    ░░░░░░░░░░      ░░░░░░░    
+
+
+
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 
 #include "imgui.h"
@@ -108,10 +122,10 @@ int main(int, char**) {
     HWND hwnd = glfwGetWin32Window(window);
 
     HICON hIcon = (HICON)LoadImage(GetModuleHandle(NULL),
-                                    MAKEINTRESOURCE(IDI_ICON1),
-                                    IMAGE_ICON,
-                                    0, 0,
-                                    LR_DEFAULTSIZE | LR_SHARED);
+        MAKEINTRESOURCE(IDI_ICON1),
+        IMAGE_ICON,
+        0, 0,
+        LR_DEFAULTSIZE | LR_SHARED);
     if (hIcon) {
         SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
         SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);

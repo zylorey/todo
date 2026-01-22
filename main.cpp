@@ -167,6 +167,7 @@ int main(int, char**) {
     char inputBuffer[256] = "";
     bool showCompleted = true;
     bool needsSave = false;
+    bool focusInput = true;
 
     // Load todos on startup
     loadTodos(todos);
@@ -212,6 +213,10 @@ int main(int, char**) {
         ImGui::Spacing();
 
         ImGui::Text("Add new task:");
+        if (focusInput) {
+            ImGui::SetKeyboardFocusHere();
+            focusInput = false;
+        }
         ImGui::SetNextItemWidth(-80);
         bool enterPressed = ImGui::InputText("##input", inputBuffer, IM_ARRAYSIZE(inputBuffer),
             ImGuiInputTextFlags_EnterReturnsTrue);
@@ -221,6 +226,7 @@ int main(int, char**) {
             todos.emplace_back(inputBuffer);
             inputBuffer[0] = '\0';
             needsSave = true;
+            focusInput = true;
         }
 
         ImGui::Spacing();

@@ -53,7 +53,7 @@ struct TodoItem {
 
 // Auto-save functions
 void saveTodos(const std::vector<TodoItem>& todos) {
-    std::ofstream file("todos.dat");
+    std::ofstream file("todo.dat");
     if (file.is_open()) {
         for (const auto& todo : todos) {
             file << todo.completed << "|" << todo.createdAt << "|" << todo.text << "\n";
@@ -100,7 +100,7 @@ int main(int, char**) {
     glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);  // Always on top
 
-    GLFWwindow* window = glfwCreateWindow(400, 400, "To-Do List", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(400, 400, "todo", NULL, NULL);
     if (window == NULL)
         return -1;
 
@@ -138,6 +138,7 @@ int main(int, char**) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.IniFilename = nullptr;
 
     float xscale, yscale;
     glfwGetWindowContentScale(window, &xscale, &yscale);
@@ -180,7 +181,7 @@ int main(int, char**) {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(io.DisplaySize);
 
-        ImGui::Begin("To-Do List", nullptr,
+        ImGui::Begin("todo", nullptr,
             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
@@ -198,7 +199,7 @@ int main(int, char**) {
 
         ImGui::SameLine(20);
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
-        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "My To Do List");
+        ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "todo");
 
         ImGui::SameLine(ImGui::GetWindowWidth() - 35);
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);

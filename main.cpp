@@ -1,3 +1,5 @@
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -6,6 +8,8 @@
 #include <string>
 #include <ctime>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 #if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -41,7 +45,40 @@ struct TodoItem {
     TodoItem(const std::string& t) : text(t), completed(false) {
         createdAt = time(nullptr);
     }
+
+    TodoItem(const std::string& t, bool c, time_t ct) : text(t), completed(c), createdAt(ct) {}
 };
+
+// Auto-save functions
+void saveTodos(const std::vector<TodoItem>& todos) {
+    std::ofstream file("todos.dat");
+    if (file.is_open()) {
+        for (const auto& todo : todos) {
+            file << todo.completed << "|" << todo.createdAt << "|" << todo.text << "\n";
+        }
+        file.close();
+    }
+}
+
+void loadTodos(std::vector<TodoItem>& todos) {
+    std::ifstream file("todos.dat");
+    if (file.is_open()) {
+        std::string line;
+        while (std::getline(file, line)) {
+            size_t firstPipe = line.find('|');
+            size_t secondPipe = line.find('|', firstPipe + 1);
+
+            if (firstPipe != std::string::npos && secondPipe != std::string::npos) {
+                bool completed = (line[0] == '1');
+                time_t createdAt = std::stoll(line.substr(firstPipe + 1, secondPipe - firstPipe - 1));
+                std::string text = line.substr(secondPipe + 1);
+
+                todos.emplace_back(text, completed, createdAt);
+            }
+        }
+        file.close();
+    }
+}
 
 int main(int, char**) {
 #if defined(_WIN32)
@@ -116,6 +153,10 @@ int main(int, char**) {
     std::vector<TodoItem> todos;
     char inputBuffer[256] = "";
     bool showCompleted = true;
+    bool needsSave = false;
+
+    // Load todos on startup
+    loadTodos(todos);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -166,6 +207,7 @@ int main(int, char**) {
         if ((ImGui::Button("Add", ImVec2(70, 0)) || enterPressed) && inputBuffer[0] != '\0') {
             todos.emplace_back(inputBuffer);
             inputBuffer[0] = '\0';
+            needsSave = true;
         }
 
         ImGui::Spacing();
@@ -185,7 +227,11 @@ int main(int, char**) {
             if (!showCompleted && todos[i].completed) continue;
 
             ImGui::PushID((int)i);
+            bool prevCompleted = todos[i].completed;
             ImGui::Checkbox("##check", &todos[i].completed);
+            if (prevCompleted != todos[i].completed) {
+                needsSave = true;
+            }
             ImGui::SameLine();
 
             if (todos[i].completed) {
@@ -200,6 +246,7 @@ int main(int, char**) {
             ImGui::SameLine(ImGui::GetWindowWidth() - 70);
             if (ImGui::Button("Delete")) {
                 todos.erase(todos.begin() + i);
+                needsSave = true;
                 ImGui::PopID();
                 break;
             }
@@ -209,13 +256,28 @@ int main(int, char**) {
         ImGui::Spacing();
 
         if (ImGui::Button("Clear Completed")) {
+            size_t prevSize = todos.size();
             todos.erase(std::remove_if(todos.begin(), todos.end(),
                 [](const TodoItem& t) { return t.completed; }), todos.end());
+            if (todos.size() != prevSize) {
+                needsSave = true;
+            }
         }
         ImGui::SameLine();
-        if (ImGui::Button("Clear All")) todos.clear();
+        if (ImGui::Button("Clear All")) {
+            if (!todos.empty()) {
+                todos.clear();
+                needsSave = true;
+            }
+        }
 
         ImGui::End();
+
+        // Auto-save if changes were made
+        if (needsSave) {
+            saveTodos(todos);
+            needsSave = false;
+        }
 
         ImGui::Render();
         int display_w, display_h;
